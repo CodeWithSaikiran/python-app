@@ -1,6 +1,7 @@
 FROM python:3.12-slim
 MAINTAINER saikiran
 LABEL this is my first python app
+EXPOSE 5000
 WORKDIR /pythonApp
 COPY requirements.txt .
 
