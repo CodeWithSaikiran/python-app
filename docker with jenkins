@@ -1,0 +1,35 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/CodeWithSaikiran/python-app.git'
+            }
+        }
+        stage('Build') {
+            steps {
+                // sh 'docker rmi $(docker images -q --filter "dangling=false")'
+                sh "docker build -t  ${image}:${version} ."
+                echo "image:- ${image}:${version}  created"
+            }
+        }
+        stage('Registory') {
+            steps {
+                script {
+                withDockerRegistry(credentialsId: 'Docker') {
+                // some block
+                sh "docker tag ${image}:${version} saikiran012/python-images:${image}-${version}"
+                sh "docker push saikiran012/python-images:${image}-${version}"
+                }
+                }
+            }
+        }
+          stage('Deploy') {
+            steps {
+                sh "docker run -itd --name ${container} -p ${hostport}:5000 ${image}:${version}"
+                echo "container:- ${container}  created"
+            }
+        }
+    }
+}
